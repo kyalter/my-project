@@ -1,3 +1,7 @@
 spring:
   application:
     name: my-project-backend
+  security:
+    jwt:
+      key: hejiayushiwoerzi
+      expire: 108000000 # 设置过期时间1天半

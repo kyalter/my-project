@@ -1,0 +1,9 @@
+<component name="ProjectDictionaryState">
+  <dictionary name="project">
+    <words>
+      <w>jwt令牌的payload载荷部分</w>
+      <w>设置的jwt过期时间</w>
+      <w>进行jwt令牌加密的密钥</w>
+    </words>
+  </dictionary>
+</component>

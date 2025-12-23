@@ -1,10 +1,13 @@
 package com.ljh.config;
 
 import com.ljh.entity.RestBean;
+import com.ljh.entity.vo.response.AuthorizeVO;
+import com.ljh.utils.JwtUtils;
+import jakarta.annotation.Resource;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.jspecify.annotations.Nullable;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -12,15 +15,16 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
 import java.io.IOException;
 
 @Configuration
 public class SecurityConfiguration {
+
+    @Resource
+    private JwtUtils jwtUtils;
 
     @Bean //不加 @Bean → 安全配置未注册 → Spring Security 使用默认策略 → 所有路径需认证 → 访问 /api/auth/login 返回 401。
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -48,9 +52,15 @@ public class SecurityConfiguration {
     public void onAuthenticationSuccess(HttpServletRequest request,
                                         HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
-        response.setContentType("application/json"); // 设置编码格式
-        response.setCharacterEncoding("UTF-8");
-        response.getWriter().write(RestBean.success().asJsonString());
+        response.setContentType("application/json;charset=UTF-8"); // 设置编码格式
+        User user = (User) authentication.getPrincipal();
+        String token = jwtUtils.createJwt(user, 1, "何佳宇");
+        AuthorizeVO vo = new AuthorizeVO();
+        vo.setExpire(jwtUtils.expireTime());
+        vo.setRole("");
+        vo.setToken(token);
+        vo.setUsername("何佳宇");
+        response.getWriter().write(RestBean.success(vo).asJsonString());
     }
     public void onAuthenticationFailure(HttpServletRequest request,
                                         HttpServletResponse response,
