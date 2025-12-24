@@ -35,7 +35,7 @@ public class JwtUtils {
 
     public boolean invalidateJwt(String headerToken){
         String token = this.convertToken(headerToken);
-        if (token != null) return false;
+        if (token == null) return false;
         JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(key)).build();
         try {
             DecodedJWT jwt = jwtVerifier.verify(token);
@@ -50,7 +50,7 @@ public class JwtUtils {
         if(this.isInvalidToken(uuid)) return false;
         Date now = new Date();
         long expire = Math.max(time.getTime() - now.getTime(),0);
-        stringRedisTemplate.opsForValue().set(Const.JWT_BLACK_LIST+uuid,"",expire, TimeUnit.MICROSECONDS);
+        stringRedisTemplate.opsForValue().set(Const.JWT_BLACK_LIST+uuid,"",expire, TimeUnit.MILLISECONDS);
         return true;
     }
 

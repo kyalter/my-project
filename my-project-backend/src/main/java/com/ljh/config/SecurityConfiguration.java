@@ -101,6 +101,10 @@ public class SecurityConfiguration {
         response.setContentType("application/json;charset=UTF-8");
         PrintWriter writer = response.getWriter();
         String authorization = request.getHeader("Authorization");
+        if (authorization == null || !authorization.startsWith("Bearer ")) {
+            writer.write(RestBean.failure(400,"未提供有效的认证信息").asJsonString());
+            return;
+        }
         if (jwtUtils.invalidateJwt(authorization)){
             writer.write(RestBean.success().asJsonString());
         }else {
